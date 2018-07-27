@@ -57,12 +57,18 @@ def process_all():
     """
 
     images = []
+    image_numpys = []
     IMAGE_PATH = 'C:\\Samples\\ImageProcessor\\Images'
 
     for (dirpath, dirnames, filenames) in walk(IMAGE_PATH):
         images.extend(filenames)
 
     for i in range(len(images)):
-        process_image(images[i], str(i))
+        nump = process_image(images[i], str(i))
+        image_numpys.append(nump)
 
-    print("Successfully processed {} files.".format(len(images)))    
+    file = open('array.txt', 'w')
+    file.write(str(image_numpys))
+
+    print("Successfully processed {} files.".format(len(images)))
+    print("You get a numpy array with length {}.".format(len(image_numpys)))    
