@@ -46,7 +46,6 @@ def process_image(image_file, count):
     # Return numpy array
     img_np = np.array(list(im3.getdata(band=0)), float)
     img_np.shape = (im3.size[1], im3.size[0])
-    print(img_np.shape)
     return img_np
 
 def process_all():
