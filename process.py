@@ -46,6 +46,7 @@ def process_image(image_file, count):
     # Return numpy array
     img_np = np.array(list(im3.getdata(band=0)), float)
     img_np.shape = (im3.size[1], im3.size[0])
+    print(img_np.shape)
     return img_np
 
 def process_all():
@@ -68,13 +69,14 @@ def process_all():
         nump = process_image(images[i], str(i))
         image_numpys.append(nump)
 
+
     # file = open('coffeearray.txt', 'w')
     # file.write(str(image_numpys))
 
-    np.savetxt("foo.csv", image_numpys, delimiter=",")
+    np.savetxt("foo.csv", image_numpys[0], delimiter=",")
 
     # df = pd.DataFrame(data=image_numpys, index=None)
     # df.to_csv("coffeecsv.csv", header=None, index=None)
 
     print("Successfully processed {} files.".format(len(images)))
-    print("You get a numpy array with length {}.".format(len(image_numpys)))    
+    print("You get a numpy array with length {}.".format(len(image_numpys)))   
