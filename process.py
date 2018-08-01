@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import pandas as pd
 from os import listdir, walk
 
 def process_image(image_file, count):
@@ -67,8 +68,13 @@ def process_all():
         nump = process_image(images[i], str(i))
         image_numpys.append(nump)
 
-    file = open('array.txt', 'w')
-    file.write(str(image_numpys))
+    # file = open('coffeearray.txt', 'w')
+    # file.write(str(image_numpys))
+
+    np.savetxt("foo.csv", image_numpys, delimiter=",")
+
+    # df = pd.DataFrame(data=image_numpys, index=None)
+    # df.to_csv("coffeecsv.csv", header=None, index=None)
 
     print("Successfully processed {} files.".format(len(images)))
     print("You get a numpy array with length {}.".format(len(image_numpys)))    
