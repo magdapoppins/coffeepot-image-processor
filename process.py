@@ -1,7 +1,14 @@
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+
 from PIL import Image
 import numpy as np
 import pandas as pd
 from os import listdir, walk, remove
+import csv
+from sklearn import datasets, svm, metrics, utils
+
 
 def convert_to_bw(path, name):
     # for example convert_to_bw("Images\\", "ONE.JPG")
@@ -29,8 +36,8 @@ def process_image(image_file, count):
         process_image(images[i], i)
         
     """
-    OUTPUT_PATH = "Processed\\"
-    INPUT_PATH = "Images\\"
+    OUTPUT_PATH = "./Processed/"
+    INPUT_PATH = "./Images/"
     WIDTH = 100
     HEIGHT = 100
     EXT = ".jpg"
@@ -61,11 +68,12 @@ def process_image(image_file, count):
 
     # Return numpy array
     img_np = np.array(list(im2.getdata(band=0)), float)
-    img_np.shape = (im2.size[1], im2.size[0])
+    img_np = img_np.reshape([10000, 1])
     return img_np
 
 def process_all():
-    """Process All
+    """
+    Process All
     Example:
     process_all()
 
@@ -74,24 +82,75 @@ def process_all():
     """
 
     images = []
-    image_numpys = []
-    IMAGE_PATH = 'C:\\Samples\\ImageProcessor\\Images'
+    image_numpys = np.empty([10000 , 1])
+    IMAGE_PATH = './Images'
 
     for (dirpath, dirnames, filenames) in walk(IMAGE_PATH):
         images.extend(filenames)
 
     for i in range(len(images)):
-        nump = process_image(images[i], str(i))
-        image_numpys.append(nump)
+        if images[i].find("BW_") == -1:
+            nump = process_image(images[i], str(i))
+            nump = np.transpose(nump)
+            #image_numpys.append(nump)
+            if i == 0:
+                image_numpys = nump
+            else:
+                image_numpys = np.concatenate((image_numpys, nump))
 
-
-    # file = open('coffeearray.txt', 'w')
-    # file.write(str(image_numpys))
-
-    np.savetxt("foo.csv", image_numpys[0], delimiter=",")
+    np.savetxt("data2.csv", image_numpys, fmt="%.2f", delimiter=",")
 
     # df = pd.DataFrame(data=image_numpys, index=None)
     # df.to_csv("coffeecsv.csv", header=None, index=None)
 
     print("Successfully processed {} files.".format(len(images)))
-    print("You get a numpy array with length {}.".format(len(image_numpys)))   
+    print("You get a numpy array with length {}.".format(len(image_numpys)))
+
+
+def load_data(filepath):
+    saveddata = np.loadtxt(filepath,delimiter=',')
+    images=[]
+    flat_data = []
+
+    # need to still add target and descr
+    target=[]
+    descr = []
+
+
+    fig = plt.figure()
+
+    count = 0
+    cols = 3
+    n_images = len(saveddata)
+
+    for i in saveddata:
+        # add flat data to array
+        flat_data.append(i)
+        # reshape the image from 10000*1 to 100*100
+        i = i.reshape([100,100])
+        images.append(i)
+
+        # plot it
+        a = fig.add_subplot(cols, np.ceil(n_images / float(cols)), count + 1)
+        plt.axis('off')
+        plt.imshow(i, cmap=plt.cm.gray, interpolation='none')
+        count = count + 1
+
+    # plot it
+    fig.set_size_inches(np.array(fig.get_size_inches()) * (n_images-1))
+    fig.tight_layout()
+    # uncomment this to show image
+    #plt.show()
+
+    return utils.Bunch(data=flat_data, target=target, target_names=np.arange(10),images=images, DESCR=descr)
+
+
+
+
+# uncomment this when u want to process images
+#process_all()
+
+#load data
+dataset = load_data("./data2.csv")
+
+print("hello there :)")
